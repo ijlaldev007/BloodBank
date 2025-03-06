@@ -119,6 +119,22 @@ const Dashboard = () => {
     }
   };
 
+  const handleDeleteDonor = async (id: string) => {
+    if (!window.confirm("Are you sure, doing this will delete this donor?")) {
+      return;
+    };
+    try {
+      await deleteDoc(doc(db, "donors", id));
+      setDonors(donors.filter((donor) => donor.id !== id));
+      alert("Donor deleted successfully");
+    }
+    catch (error) {
+      console.error("Error deleting document:", error);
+      alert("Error deleting document. Please try again.");
+    }
+
+  };
+
   // Logout function
   const handleLogout = async () => {
     try {
@@ -176,7 +192,7 @@ const Dashboard = () => {
                       Edit
                     </button>
                     <button
-                      // onClick={() => handleDeleteDonor(donor.id)}
+                      onClick={() => handleDeleteDonor(donor.id)}
                       className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition">
                       Delete
                     </button>
