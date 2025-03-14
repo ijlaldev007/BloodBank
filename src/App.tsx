@@ -11,6 +11,7 @@ import Register from "./pages/Register";
 import AdminDashboard from "./pages/AdminDashboard";
 import DonorDashboard from "./pages/DonorDashboard";
 import PatientDashboard from "./pages/PatientDashboard";
+import Matches from "./pages/Matches";
 
 //import SeedDonors from "./components/SeedDonors";
 // import SeedPatients from "./components/SeedPatients";
@@ -74,14 +75,14 @@ const App = () => {
   }
 
   return (
-    
+
     <Router>
-      
+
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
         <Route path="/register" element={!user ? <Register /> : <Navigate to="/" />} />
-        
+
 
 
 
@@ -91,6 +92,11 @@ const App = () => {
         {user && (role === "patient" || role === "admin") && (
           <Route path="/patient-dashboard" element={<PatientDashboard />} />
         )}
+
+        {user && role === "admin" && (
+          <Route path="/admin-matches" element={<Matches />} />
+        )}
+
 
 
         {/* Default Redirect */}
