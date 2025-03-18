@@ -3,10 +3,12 @@ import { signOut } from "firebase/auth";
 import { auth } from "../firebase/firebase";
 import { useNavigate } from "react-router-dom";
 import { FaSignOutAlt } from "react-icons/fa";  // ✅ Correct Named Import
+import { useAuth } from "../context/AuthContext";
 import PropTypes from "prop-types";
 
 const Header = () => {
     const navigate = useNavigate();
+    const { user, role } = useAuth();
 
     const handleLogout = async () => {
         await signOut(auth);
