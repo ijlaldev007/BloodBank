@@ -1,7 +1,8 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 
-import { FaSignOutAlt, FaHome, FaHeartbeat, FaHandshake } from "react-icons/fa";
+
+
 
 
 interface SidebarProps {
@@ -26,7 +27,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onAddDonor }) => {
                                 }`
                             }
                         >
-                            <FaHome size={20} />
+                            
                             Dashboard
                         </NavLink>
                     </li>
@@ -39,7 +40,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onAddDonor }) => {
                                 }`
                             }
                         >
-                            <FaHeartbeat size={20} />
+                            
                             Patients
                         </NavLink>
                     </li>
@@ -51,7 +52,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onAddDonor }) => {
                                 `flex items-center gap-4 px-6 py-3 text-lg hover:bg-gray-700 transition ${isActive ? "bg-gray-700" : ""}`
                             }
                         >
-                            <FaHandshake size={20} />
+                            
                             Matches
                         </NavLink>
                     </li>
@@ -61,4 +62,4 @@ const Sidebar: React.FC<SidebarProps> = ({ onAddDonor }) => {
     );
 }
 
-export default Sidebar;
+export default Sidebar;  

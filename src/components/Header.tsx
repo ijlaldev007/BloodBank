@@ -2,7 +2,8 @@ import React from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase/firebase";
 import { useNavigate } from "react-router-dom";
-import { FaSignOutAlt } from "react-icons/fa";  // ✅ Correct Named Import
+
+
 import { useAuth } from "../context/AuthContext";
 import PropTypes from "prop-types";
 
@@ -25,7 +26,7 @@ const Header = () => {
                 onClick={handleLogout}
                 className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition duration-300 shadow-md"
             >
-                <FaSignOutAlt size={18} />
+                
                 <span>Logout</span>
             </button>
         </header>
