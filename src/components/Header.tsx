@@ -17,8 +17,8 @@ const Header = () => {
     };
 
     return (
-        <header className="bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg py-4 px-6 flex justify-between items-center">
-            <h1 className="text-white text-2xl font-bold tracking-wide">
+        <header className="bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg py-2 px-2 flex justify-between items-center">
+            <h1 className=" text-2xl font-bold tracking-wide">
                 Blood Donor Admin
             </h1>
 

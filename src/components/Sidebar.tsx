@@ -1,65 +1,150 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 
+import {
+    Card,
+    Typography,
+    List,
+    ListItem,
+    ListItemPrefix,
+    // ListItemSuffix, Chip, // Only import these if you need them
+} from "@material-tailwind/react";
 
-
-
+import {
+    PresentationChartBarIcon,
+    InboxIcon,
+    UserCircleIcon,
+    Cog6ToothIcon,
+    PowerIcon,
+} from "@heroicons/react/24/solid";
 
 interface SidebarProps {
-    onAddDonor?: () => void;
+    onAddDonor?: () => void; // Made optional
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ onAddDonor }) => {
     return (
-        <aside className="w-48 h-screen bg-gray-800 text-white shadow-lg fixed">
-            <div className="p-6">
-                <h2 className="text-2xl font-bold text-center text-white">
+        <Card
+            className="h-screen w-[10rem]  p-3 shadow-xl shadow-blue-gray-900/5"
+            variant="gradient"
+            placeholder=""
+            onPointerEnterCapture={() => { }}
+            onPointerLeaveCapture={() => { }}
+        >
+            <div className="mb-2 p-2">
+                <Typography variant="h5" color="blue-gray"
+                    placeholder=""
+                    onPointerEnterCapture={() => { }}
+                    onPointerLeaveCapture={() => { }}>
                     Admin Panel
-                </h2>
+                </Typography>
             </div>
-            <nav className="mt-6">
-                <ul className="space-y-4">
-                    <li>
-                        <NavLink
-                            to="/admin-dashboard"
-                            className={({ isActive }) =>
-                                `flex items-center gap-4 px-6 py-3 text-lg hover:bg-gray-700 transition ${isActive ? "bg-gray-700" : ""
-                                }`
-                            }
-                        >
-                            
-                            Dashboard
-                        </NavLink>
-                    </li>
+            <List placeholder=""
+                onPointerEnterCapture={() => { }}
+                onPointerLeaveCapture={() => { }}>
+                <ListItem
+                    placeholder=""
+                    onPointerEnterCapture={() => { }}
+                    onPointerLeaveCapture={() => { }}>
+                    <ListItemPrefix
+                        placeholder=""
+                        onPointerEnterCapture={() => { }}
+                        onPointerLeaveCapture={() => { }}>
+                        <PresentationChartBarIcon className="h-5 w-5" />
+                    </ListItemPrefix>
+                    <NavLink
+                        to="/admin-dashboard"
+                        className={({ isActive }) =>
+                            `flex items-center gap-2 px-4 py-2 text-lg hover:bg-gray-700 transition ${isActive ? "bg-gray-700" : ""
+                            }`
+                        }
+                    >
+                        Dashboard
+                    </NavLink>
+                </ListItem>
 
-                    <li>
-                        <NavLink
-                            to="/patient-dashboard"  // Update route from "/admin-patients" to "/patient-dashboard"
-                            className={({ isActive }) =>
-                                `flex items-center gap-4 px-6 py-3 text-lg hover:bg-gray-700 transition ${isActive ? "bg-gray-700" : ""
-                                }`
-                            }
-                        >
-                            
-                            Patients
-                        </NavLink>
-                    </li>
+                <ListItem
+                    placeholder=""
+                    onPointerEnterCapture={() => { }}
+                    onPointerLeaveCapture={() => { }}>
+                    <ListItemPrefix
+                        placeholder=""
+                        onPointerEnterCapture={() => { }}
+                        onPointerLeaveCapture={() => { }}>
+                        <InboxIcon className="h-5 w-5" />
+                    </ListItemPrefix>
+                    <NavLink
+                        to="/patient-dashboard"
+                        className={({ isActive }) =>
+                            `flex items-center gap-2 px-3 py-2 text-lg hover:bg-gray-700 transition ${isActive ? "bg-gray-700" : ""
+                            }`
+                        }
+                    >
+                        Patients
+                    </NavLink>
+                </ListItem>
 
-                    <li>
-                        <NavLink
-                            to="/admin-matches"
-                            className={({ isActive }) =>
-                                `flex items-center gap-4 px-6 py-3 text-lg hover:bg-gray-700 transition ${isActive ? "bg-gray-700" : ""}`
-                            }
-                        >
-                            
-                            Matches
-                        </NavLink>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
+                <ListItem
+                    placeholder=""
+                    onPointerEnterCapture={() => { }}
+                    onPointerLeaveCapture={() => { }}>
+                    <ListItemPrefix
+                        placeholder=""
+                        onPointerEnterCapture={() => { }}
+                        onPointerLeaveCapture={() => { }}>
+                        <UserCircleIcon className="h-5 w-5" />
+                    </ListItemPrefix>
+                    <NavLink
+                        to="/admin-matches"
+                        className={({ isActive }) =>
+                            `flex items-center gap-2 px-3 py-2 text-lg hover:bg-gray-700 transition ${isActive ? "bg-gray-700" : ""
+                            }`
+                        }
+                    >
+                        Matches
+                    </NavLink>
+                </ListItem>
+
+                <ListItem placeholder=""
+                    onPointerEnterCapture={() => { }}
+                    onPointerLeaveCapture={() => { }}>
+                    <ListItemPrefix placeholder=""
+                        onPointerEnterCapture={() => { }}
+                        onPointerLeaveCapture={() => { }}>
+                        <Cog6ToothIcon className="h-5 w-5" />
+                    </ListItemPrefix>
+                    <NavLink
+                        to="/settings"
+                        className={({ isActive }) =>
+                            `flex items-center gap-2 px-3 py-2 text-lg hover:bg-gray-700 transition ${isActive ? "bg-gray-700" : ""
+                            }`
+                        }
+                    >
+                        Settings
+                    </NavLink>
+                </ListItem>
+
+                <ListItem placeholder=""
+                    onPointerEnterCapture={() => { }}
+                    onPointerLeaveCapture={() => { }}>
+                    <ListItemPrefix placeholder=""
+                        onPointerEnterCapture={() => { }}
+                        onPointerLeaveCapture={() => { }}>
+                        <PowerIcon className="h-5 w-5" />
+                    </ListItemPrefix>
+                    <NavLink
+                        to="/logout"
+                        className={({ isActive }) =>
+                            `flex items-center gap-2 px-3 py-2 text-lg hover:bg-gray-700 transition ${isActive ? "bg-gray-700" : ""
+                            }`
+                        }
+                    >
+                        Log Out
+                    </NavLink>
+                </ListItem>
+            </List>
+        </Card>
     );
-}
+};
 
-export default Sidebar;  
+export default Sidebar;

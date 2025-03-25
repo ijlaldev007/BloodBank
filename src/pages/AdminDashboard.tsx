@@ -1,123 +1,53 @@
 import React, { useState, useEffect } from "react";
-import { auth, db } from "../firebase/firebase";
 import { signOut } from "firebase/auth";
-import { collection, getDocs, addDoc, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
-import Header from "../components/Header";
+import { auth } from "../firebase/firebase";
 import Sidebar from "../components/Sidebar";
 import DonorModal from "../components/DonorModal";
-import DonorTable from "../components/DonorTable";  // ✅ Importing DonorTable
+import DonorTable from "../components/DonorTable";
+
+import { Donor, initialDonorFormData } from "../types/donor";
+import { fetchDonors, addDonor, updateDonor, deleteDonor } from "../services/donorService";
+import { computeEligibility } from "../utils/eligibility";
+
+import { Bars3Icon } from "@heroicons/react/24/outline";
 
 const AdminDashboard = () => {
-    const [donors, setDonors] = useState<{
-        id: string;
-        name: string;
-        bloodGroup: string;
-        rhFactor: string;
-        lastDonationDate: string;
-        ongoingMedications: string;
-        chronicDiseases: string;
-        weight: string;
-        hemoglobinLevel: string;
-        allergies: string;
-        eligible: string;
-        city: string;
-        contact: string;
-    }[]>([]);
-
-    const [formData, setFormData] = useState({
-        name: "",
-        bloodGroup: "",
-        rhFactor: "",
-        lastDonationDate: "",
-        ongoingMedications: "",
-        chronicDiseases: "",
-        weight: "",
-        hemoglobinLevel: "",
-        allergies: "",
-        eligible: "",
-        city: "",
-        contact: ""
-    });
-
+    const [donors, setDonors] = useState<Donor[]>([]);
+    const [formData, setFormData] = useState(initialDonorFormData);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingDonor, setEditingDonor] = useState<{
-        id: string;
-        name: string;
-        bloodGroup: string;
-        city: string;
-        contact: string;
-    } | null>(null);
-
+    const [editingDonor, setEditingDonor] = useState<Donor | null>(null);
     const navigate = useNavigate();
 
-
-
     useEffect(() => {
-        const fetchDonors = async () => {
+        const loadDonors = async () => {
             try {
-                const querySnapshot = await getDocs(collection(db, "donors"));
-                const donorList = querySnapshot.docs.map((doc) => {
-                    const data = doc.data();
-                    return {
-                        id: doc.id,
-                        name: data.name || "Unknown",
-                        bloodGroup: data.bloodGroup || "Unknown",
-                        rhFactor: data.rhFactor || "Unknown",
-                        lastDonationDate: data.lastDonationDate || "Unknown",
-                        ongoingMedications: data.ongoingMedications || "None",
-                        chronicDiseases: data.chronicDiseases || "None",
-                        weight: data.weight || "Unknown",
-                        hemoglobinLevel: data.hemoglobinLevel || "Unknown",
-                        allergies: data.allergies || "None",
-                        eligible: data.eligible || "No",
-                        city: data.city || "Unknown",
-                        contact: data.contact || "N/A",
-                    };
-                });
+                const donorList = await fetchDonors();
                 setDonors(donorList);
             } catch (error) {
-                console.error("Error fetching donors:", error);
+                console.error(error);
             }
         };
-        fetchDonors();
+        loadDonors();
     }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-
         const { name, value } = e.target;
         let updatedValue = value;
-
         if (name === "lastDonationDate") {
             const eligibility = computeEligibility(value);
-            setFormData(prev => ({ ...prev, [name]: updatedValue, eligible: eligibility }));
+            setFormData((prev) => ({ ...prev, [name]: updatedValue, eligible: eligibility }));
         } else {
-            setFormData(prev => ({ ...prev, [name]: updatedValue }));
+            setFormData((prev) => ({ ...prev, [name]: updatedValue }));
         }
     };
 
-    const handleEditDonor = (donor: any) => {
-        setFormData({
-            name: donor.name,
-            bloodGroup: donor.bloodGroup,
-            rhFactor: donor.rhFactor || "",
-            lastDonationDate: donor.lastDonationDate || "",
-            ongoingMedications: donor.ongoingMedications || "",
-            chronicDiseases: donor.chronicDiseases || "",
-            weight: donor.weight || "",
-            hemoglobinLevel: donor.hemoglobinLevel || "",
-            allergies: donor.allergies || "",
-            eligible: donor.eligible || "",
-            city: donor.city,
-            contact: donor.contact
-        });
+    const handleEditDonor = (donor: Donor) => {
+        setFormData({ ...donor });
         setEditingDonor(donor);
         setIsModalOpen(true);
     };
-
-
 
     const handleAddDonor = () => {
         setEditingDonor(null);
@@ -127,63 +57,35 @@ const AdminDashboard = () => {
     const handleDeleteDonor = async (id: string) => {
         if (window.confirm("Are you sure you want to delete this donor?")) {
             try {
-                await deleteDoc(doc(db, "donors", id));
+                await deleteDonor(id);
                 setDonors(donors.filter((donor) => donor.id !== id));
             } catch (error) {
-                console.error("Error deleting donor:", error);
+                console.error(error);
             }
         }
     };
 
     const handleSaveOrUpdateDonor = async () => {
-        if (editingDonor) {
-            try {
-                await updateDoc(doc(db, "donors", editingDonor.id), formData);
-                setDonors(donors.map((d) => (d.id === editingDonor.id ? { id: editingDonor.id, ...formData } : d)));
-                setIsModalOpen(false);
+        try {
+            if (editingDonor) {
+                await updateDonor(editingDonor.id, formData);
+                setDonors(
+                    donors.map((d) => (d.id === editingDonor.id ? { id: editingDonor.id, ...formData } : d))
+                );
                 alert("Donor updated successfully");
-            } catch (error) {
-                console.error("Error updating donor:", error);
-                alert("Failed to update donor. Please try again.");
-            }
-        } else {
-            try {
-                const docRef = await addDoc(collection(db, "donors"), formData);
-                setDonors([...donors, { id: docRef.id, ...formData }]);
-                setIsModalOpen(false);
+            } else {
+                const newDonor = await addDonor(formData);
+                setDonors([...donors, newDonor]);
                 alert("Donor added successfully");
-            } catch (error) {
-                console.error("Error adding donor:", error);
-                alert("Failed to add donor. Please try again.");
             }
+            setIsModalOpen(false);
+            setFormData(initialDonorFormData);
+            setEditingDonor(null);
+        } catch (error) {
+            console.error(error);
+            alert("Operation failed. Please try again.");
         }
-        setFormData({
-            name: "",
-            bloodGroup: "",
-            rhFactor: "",
-            lastDonationDate: "",
-            ongoingMedications: "",
-            chronicDiseases: "",
-            weight: "",
-            hemoglobinLevel: "",
-            allergies: "",
-            eligible: "",
-            city: "",
-            contact: ""
-        });
-
-        setEditingDonor(null);
     };
-
-    const computeEligibility = (lastDonationDate: string): string => {
-        if (!lastDonationDate) return "No";
-        const donationDate = new Date(lastDonationDate);
-        const currentDate = new Date();
-        const diffInTime = currentDate.getTime() - donationDate.getTime();
-        const diffInDays = diffInTime / (1000 * 3600 * 24);
-        return diffInDays >= 90 ? "Yes" : "No";
-    };
-
 
     const handleLogout = async () => {
         await signOut(auth);
@@ -191,44 +93,50 @@ const AdminDashboard = () => {
     };
 
     return (
-        <div className="flex h-screen">
-            {/* Sidebar */}
-            <div className="w-48 flex-shrink-0">
-                <Sidebar />
+        <div className="flex h-screen bg-gray-50 relative">
+            {/* Sidebar (fixed) */}
+            <div className=" left-0 top-0 h-screen w-[10rem] z-10">
+                <Sidebar onAddDonor={handleAddDonor} />
             </div>
 
-            {/* Main Content */}
-            <div className="flex-1 flex flex-col">
-                <Header />
+            {/* Main content */}
+            <div className="flex-1 flex flex-col ">
+                <div className="pl-[10rem] pr-4 pt-4 pb-4"> {/* Left padding = sidebar width */}
+                    <div className="p-3">
+                        <div className="flex items-center gap-4 mb-4">
+                            <h2 className="text-1xl font-bold">Admin Dashboard</h2>
+                            <button
+                                onClick={handleAddDonor}
+                                className="bg-green-500 text-white px-4 py-2 rounded"
+                            >
+                                Add Donor
+                            </button>
+                        </div>
 
-                <div className="p-6">
-                    <h2 className="text-2xl font-bold mb-4">Admin Dashboard</h2>
+                        <h3 className="text-lg font-semibold mb-2 mt-4">Donor List</h3>
 
-                    <button onClick={handleAddDonor} className="bg-green-500 text-white px-4 py-2 rounded ml-4">
-                        Add Donor
-                    </button>
+                        <div className=" pr-2">
+                            <DonorTable
+                                donors={donors}
+                                handleDeleteDonor={handleDeleteDonor}
+                                handleEditDonor={handleEditDonor}
+                            />
+                        </div>
 
-                    <h3 className="text-lg font-semibold mb-2 mt-4">Donor List</h3>
-
-                    {/* ✅ Using DonorTable Component */}
-                    <DonorTable
-                        donors={donors}
-                        handleDeleteDonor={handleDeleteDonor}
-                        handleEditDonor={handleEditDonor}
-                    />
-
-                    <DonorModal
-                        isOpen={isModalOpen}
-                        onClose={() => setIsModalOpen(false)}
-                        onSave={handleSaveOrUpdateDonor}
-                        onChange={handleChange}
-                        formData={formData}   // ✅ Pass the formData here
-                        isEditing={Boolean(editingDonor)}
-                    />
-
+                        <DonorModal
+                            isOpen={isModalOpen}
+                            onClose={() => setIsModalOpen(false)}
+                            onSave={handleSaveOrUpdateDonor}
+                            onChange={handleChange}
+                            formData={formData}
+                            isEditing={Boolean(editingDonor)}
+                        />
+                    </div>
                 </div>
             </div>
         </div>
+
+
     );
 };
 
