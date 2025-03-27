@@ -30,6 +30,7 @@ const PatientDashboard: React.FC = () => {
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPatient, setEditingPatient] = useState<Patient | null>(null);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -133,7 +134,9 @@ const PatientDashboard: React.FC = () => {
     <div className="flex h-screen">
       {/* Sidebar */}
       <div className="w-48 flex-shrink-0">
-        <Sidebar />
+        <Sidebar
+          isCollapsed={isSidebarCollapsed}
+          onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)} />
       </div>
 
       {/* Main Content */}

@@ -17,18 +17,21 @@ const Header = () => {
     };
 
     return (
-        <header className="bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg py-2 px-2 flex justify-between items-center">
-            <h1 className=" text-2xl font-bold tracking-wide">
-                Blood Donor Admin
+        // Update the header to:
+        <header className="sticky top-0 z-10 bg-white shadow-md py-4 px-6 flex justify-between items-center">
+            <h1 className="text-2xl font-bold text-red-600">
+                <span className="hidden md:inline">Blood Donation</span> Management
             </h1>
 
-            <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition duration-300 shadow-md"
-            >
-                
-                <span>Logout</span>
-            </button>
+            <div className="flex items-center gap-4">
+                <span className="text-gray-600">{user?.email}</span>
+                <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-colors"
+                >
+                    <span>Logout</span>
+                </button>
+            </div>
         </header>
     );
 }

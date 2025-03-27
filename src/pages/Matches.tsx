@@ -35,6 +35,7 @@ const Matches = () => {
     const [donors, setDonors] = useState<Donor[]>([]);
     const [patients, setPatients] = useState<Patient[]>([]);
     const [matches, setMatches] = useState<Match[]>([]);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -98,11 +99,12 @@ const Matches = () => {
 
         });
         setMatches(foundMatches);
-    },[donors, patients]);
+    }, [donors, patients]);
     return (
         <div className="flex h-screen">
             <div className="w-48 flex-shrink-0">
-                <Sidebar />
+                <Sidebar isCollapsed={isSidebarCollapsed}
+                    onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)} />
             </div>
             <div className="flex-1 flex flex-col">
                 <Header />

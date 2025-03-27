@@ -4,24 +4,34 @@ import './index.css';
 import App from './App';
 import { AuthProvider } from './context/AuthContext';
 import reportWebVitals from './reportWebVitals';
-import { ThemeProvider } from "@material-tailwind/react";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+
+// Optionally define a custom theme
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#1976d2', // Customize the primary color if needed
+    },
+    secondary: {
+      main: '#d32f2f', // Customize the secondary color if needed
+    },
+  },
+});
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-      <AuthProvider>
-    <ThemeProvider>
-
+    <AuthProvider>
+      {/* Wrap the App with MUI's ThemeProvider */}
+      <ThemeProvider theme={theme}>
         <App />
-
-    </ThemeProvider>
-      </AuthProvider>
+      </ThemeProvider>
+    </AuthProvider>
   </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+// or

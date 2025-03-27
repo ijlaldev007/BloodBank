@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Typography } from "@material-tailwind/react";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TablePagination, Typography, Button, Paper } from "@mui/material";
 import { Donor } from "../types/donor"; // Import the Donor type
 
 interface DonorTableProps {
@@ -25,118 +25,90 @@ const TABLE_HEADERS = [
 ];
 
 const DonorTable: React.FC<DonorTableProps> = ({ donors, handleDeleteDonor, handleEditDonor }) => {
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
   return (
-    <Card
-      className="h-full w-full overflow-scroll shadow-md"
-      variant="filled"
-      placeholder=""
-      onPointerEnterCapture={() => {}}
-      onPointerLeaveCapture={() => {}}
-    >
-      <table className="w-full min-w-max table-auto text-left">
-        <thead>
-          <tr>
+    <TableContainer component={Paper} className="h-full w-full overflow-scroll shadow-md">
+      <Table sx={{ minWidth: 650 }} aria-label="donor table">
+        <TableHead>
+          <TableRow>
             {TABLE_HEADERS.map((head) => (
-              <th key={head} className="border-b border-blue-gray-100 bg-blue-gray-50 p-4">
-                <Typography variant="small" color="blue-gray" className="font-normal leading-none opacity-70">
+              <TableCell key={head}>
+                <Typography variant="body1" color="textSecondary">
                   {head}
                 </Typography>
-              </th>
+              </TableCell>
             ))}
-          </tr>
-        </thead>
-        <tbody>
+          </TableRow>
+        </TableHead>
+        <TableBody>
           {donors.length === 0 ? (
-            <tr>
-              <td colSpan={TABLE_HEADERS.length} className="p-4 text-center">
-                <Typography variant="small" color="blue-gray" className="font-normal">
+            <TableRow>
+              <TableCell colSpan={TABLE_HEADERS.length} align="center">
+                <Typography variant="body2" color="textSecondary">
                   No donors found.
                 </Typography>
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ) : (
-            donors.map((donor) => (
-              <tr key={donor.id} className="even:bg-blue-gray-50/50 hover:bg-blue-gray-50 transition-colors">
-                <td className="p-4">
-                  <Typography variant="small" color="blue-gray">
-                    {donor.name}
-                  </Typography>
-                </td>
-                <td className="p-4">
-                  <Typography variant="small" color="blue-gray">
-                    {donor.bloodGroup}
-                  </Typography>
-                </td>
-                <td className="p-4">
-                  <Typography variant="small" color="blue-gray">
-                    {donor.rhFactor}
-                  </Typography>
-                </td>
-                <td className="p-4">
-                  <Typography variant="small" color="blue-gray">
-                    {donor.lastDonationDate}
-                  </Typography>
-                </td>
-                <td className="p-4">
-                  <Typography variant="small" color="blue-gray">
-                    {donor.ongoingMedications}
-                  </Typography>
-                </td>
-                <td className="p-4">
-                  <Typography variant="small" color="blue-gray">
-                    {donor.chronicDiseases}
-                  </Typography>
-                </td>
-                <td className="p-4">
-                  <Typography variant="small" color="blue-gray">
-                    {donor.weight}
-                  </Typography>
-                </td>
-                <td className="p-4">
-                  <Typography variant="small" color="blue-gray">
-                    {donor.hemoglobinLevel}
-                  </Typography>
-                </td>
-                <td className="p-4">
-                  <Typography variant="small" color="blue-gray">
-                    {donor.allergies}
-                  </Typography>
-                </td>
-                <td className="p-4">
-                  <Typography variant="small" color="blue-gray">
-                    {donor.eligible}
-                  </Typography>
-                </td>
-                <td className="p-4">
-                  <Typography variant="small" color="blue-gray">
-                    {donor.city}
-                  </Typography>
-                </td>
-                <td className="p-4">
-                  <Typography variant="small" color="blue-gray">
-                    {donor.contact}
-                  </Typography>
-                </td>
-                <td className="p-4 flex gap-2">
-                  <button
+            donors.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((donor) => (
+              <TableRow key={donor.id}>
+                <TableCell>{donor.name}</TableCell>
+                <TableCell>{donor.bloodGroup}</TableCell>
+                <TableCell>{donor.rhFactor}</TableCell>
+                <TableCell>{donor.lastDonationDate}</TableCell>
+                <TableCell>{donor.ongoingMedications}</TableCell>
+                <TableCell>{donor.chronicDiseases}</TableCell>
+                <TableCell>{donor.weight}</TableCell>
+                <TableCell>{donor.hemoglobinLevel}</TableCell>
+                <TableCell>{donor.allergies}</TableCell>
+                <TableCell>{donor.eligible}</TableCell>
+                <TableCell>{donor.city}</TableCell>
+                <TableCell>{donor.contact}</TableCell>
+                <TableCell>
+                  <Button
                     onClick={() => handleEditDonor(donor)}
-                    className="bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600 transition"
+                    variant="contained"
+                    color="warning"
+                    size="small"
+                    style={{ marginRight: 10 }}
                   >
                     Edit
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={() => handleDeleteDonor(donor.id)}
-                    className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition"
+                    variant="contained"
+                    color="error"
+                    size="small"
                   >
                     Delete
-                  </button>
-                </td>
-              </tr>
+                  </Button>
+                </TableCell>
+              </TableRow>
             ))
           )}
-        </tbody>
-      </table>
-    </Card>
+        </TableBody>
+      </Table>
+      <TablePagination
+        rowsPerPageOptions={[5, 10, 25]}
+        component="div"
+        count={donors.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
+    </TableContainer>
   );
 };
 

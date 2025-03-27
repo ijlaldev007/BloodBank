@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-
 import { auth } from "../firebase/firebase";
 import Sidebar from "../components/Sidebar";
 import DonorModal from "../components/DonorModal";
 import DonorTable from "../components/DonorTable";
-
+import Header from "../components/Header";
 import { Donor, initialDonorFormData } from "../types/donor";
 import { fetchDonors, addDonor, updateDonor, deleteDonor } from "../services/donorService";
 import { computeEligibility } from "../utils/eligibility";
+import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 
-import { Bars3Icon } from "@heroicons/react/24/outline";
 
 const AdminDashboard = () => {
     const [donors, setDonors] = useState<Donor[]>([]);
     const [formData, setFormData] = useState(initialDonorFormData);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingDonor, setEditingDonor] = useState<Donor | null>(null);
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -93,45 +93,63 @@ const AdminDashboard = () => {
     };
 
     return (
-        <div className="flex h-screen bg-gray-50 relative">
-            {/* Sidebar (fixed) */}
-            <div className=" left-0 top-0 h-screen w-[10rem] z-10">
-                <Sidebar onAddDonor={handleAddDonor} />
+
+
+
+        <div className="flex h-screen bg-gray-50">
+            {/* Collapsible Sidebar */}
+            <div className={`fixed h-screen z-20 transition-all duration-300 ${isSidebarCollapsed ? 'w-[80px]' : 'w-[260px]'}`}>
+                <Sidebar
+                    onAddDonor={handleAddDonor}
+                    isCollapsed={isSidebarCollapsed}
+                    onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                />
             </div>
 
             {/* Main content */}
-            <div className="flex-1 flex flex-col ">
-                <div className="pl-[10rem] pr-4 pt-4 pb-4"> {/* Left padding = sidebar width */}
-                    <div className="p-3">
-                        <div className="flex items-center gap-4 mb-4">
-                            <h2 className="text-1xl font-bold">Admin Dashboard</h2>
-                            <button
-                                onClick={handleAddDonor}
-                                className="bg-green-500 text-white px-4 py-2 rounded"
-                            >
-                                Add Donor
-                            </button>
+            <div className={`flex-1 flex flex-col transition-all duration-300 ${isSidebarCollapsed ? 'ml-[80px]' : 'ml-[260px]'}`}>
+                <Header />
+
+                <div className="px-6 py-6">
+                    {/* Dashboard Header */}
+                    <div className="flex justify-between items-center mb-8">
+                        <div>
+                            <h1 className="text-2xl font-bold text-gray-800">Donor Management</h1>
+                            <p className="text-gray-600 mt-1">{donors.length} registered donors</p>
+                        </div>
+                        <button
+                            onClick={handleAddDonor}
+                            className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center gap-2"
+                        >
+                            <span>+</span>
+                            <span>Add New Donor</span>
+                        </button>
+                    </div>
+
+                    {/* Donor List Card */}
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-lg font-semibold text-gray-800">Registered Donors</h3>
+                            <div className="flex items-center gap-4">
+                                <span className="text-sm text-gray-500">{donors.length} entries</span>
+                            </div>
                         </div>
 
-                        <h3 className="text-lg font-semibold mb-2 mt-4">Donor List</h3>
-
-                        <div className=" pr-2">
-                            <DonorTable
-                                donors={donors}
-                                handleDeleteDonor={handleDeleteDonor}
-                                handleEditDonor={handleEditDonor}
-                            />
-                        </div>
-
-                        <DonorModal
-                            isOpen={isModalOpen}
-                            onClose={() => setIsModalOpen(false)}
-                            onSave={handleSaveOrUpdateDonor}
-                            onChange={handleChange}
-                            formData={formData}
-                            isEditing={Boolean(editingDonor)}
+                        <DonorTable
+                            donors={donors}
+                            handleDeleteDonor={handleDeleteDonor}
+                            handleEditDonor={handleEditDonor}
                         />
                     </div>
+
+                    <DonorModal
+                        isOpen={isModalOpen}
+                        onClose={() => setIsModalOpen(false)}
+                        onSave={handleSaveOrUpdateDonor}
+                        onChange={handleChange}
+                        formData={formData}
+                        isEditing={Boolean(editingDonor)}
+                    />
                 </div>
             </div>
         </div>
