@@ -19,24 +19,28 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({
   onAddDonor,
-  isCollapsed = false,  // Default value
-  onToggleCollapse = () => { }  // Default empty function
+  isCollapsed = false,
+  onToggleCollapse = () => { }
 }) => {
   return (
     <div className={`fixed left-0 top-0 h-screen bg-white shadow-xl flex flex-col border-r border-gray-100 transition-all duration-300 ${isCollapsed ? 'w-[80px]' : 'w-[260px]'
       }`}>
       {/* Sidebar Header */}
       <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-        <div className={`flex items-center gap-3 ${isCollapsed ? 'invisible' : 'visible'}`}>
-          <FavoriteBorderOutlined className="text-red-500 text-2xl" />
-          <h1 className="text-xl font-bold text-gray-800">BloodConnect</h1>
+        {!isCollapsed && (
+          <div className="flex items-center gap-3">
+            <FavoriteBorderOutlined className="text-red-500 text-2xl" />
+            <h1 className="text-xl font-bold text-gray-800">BloodConnect</h1>
+          </div>
+        )}
+        <div className={`flex ${isCollapsed ? 'justify-center w-full' : ''}`}>
+          <IconButton
+            onClick={onToggleCollapse}
+            className="!text-gray-600 hover:!bg-gray-100"
+          >
+            {isCollapsed ? <ChevronRight /> : <ChevronLeft />}
+          </IconButton>
         </div>
-        <IconButton
-          onClick={onToggleCollapse}
-          className="!text-gray-600 hover:!bg-gray-100"
-        >
-          {isCollapsed ? <ChevronRight /> : <ChevronLeft />}
-        </IconButton>
       </div>
 
       {/* Menu Items */}
@@ -103,15 +107,14 @@ const NavItem: React.FC<NavItemProps> = ({ to, icon, label, isCollapsed }) => (
   <ListItem className="!px-0">
     <NavLink
       to={to}
-      className={({ isActive }: { isActive: boolean }) =>
+      className={({ isActive }) =>
         `flex items-center w-full p-3 rounded-lg transition-colors ${isActive ? 'bg-red-50 text-red-600' : 'text-gray-600 hover:bg-gray-50'
         } ${isCollapsed ? 'justify-center' : 'px-4'}`
       }
     >
       <ListItemIcon className="!min-w-0">
         {React.cloneElement(icon, {
-          className: ({ isActive }: { isActive: boolean }) =>
-            `text-current ${isActive ? '!text-red-500' : ''}`
+          className: `text-current ${icon.props.className || ''}`
         })}
       </ListItemIcon>
       {!isCollapsed && (

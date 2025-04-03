@@ -127,7 +127,7 @@ const AdminDashboard = () => {
                     </div>
 
                     {/* Donor List Card */}
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-800 p-6">
                         <div className="flex items-center justify-between mb-6">
                             <h3 className="text-lg font-semibold text-gray-800">Registered Donors</h3>
                             <div className="flex items-center gap-4">
