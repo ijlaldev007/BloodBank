@@ -80,7 +80,6 @@ const PatientDashboard: React.FC = () => {
   // Save new patient or update existing one
   const handleSaveOrUpdatePatient = async () => {
     if (editingPatient) {
-      // Update existing patient
       try {
         await updateDoc(doc(db, "patients", editingPatient.id), formData);
         setPatients(
@@ -88,27 +87,24 @@ const PatientDashboard: React.FC = () => {
             p.id === editingPatient.id ? { id: editingPatient.id, ...formData } : p
           )
         );
-        setIsModalOpen(false);
-        setEditingPatient(null);
         alert("Patient updated successfully");
       } catch (error) {
         console.error("Error updating patient:", error);
         alert("Failed to update patient. Please try again.");
       }
     } else {
-      // Add new patient
       try {
         const docRef = await addDoc(collection(db, "patients"), formData);
         setPatients([...patients, { id: docRef.id, ...formData }]);
-        setIsModalOpen(false);
         alert("Patient added successfully");
       } catch (error) {
         console.error("Error adding patient:", error);
         alert("Failed to add patient. Please try again.");
       }
     }
-    // Reset formData after save
+    setIsModalOpen(false);
     setFormData({ name: "", age: "", bloodGroup: "", rhFactor: "", city: "", contact: "" });
+    setEditingPatient(null);
   };
 
   const handleDeletePatient = async (id: string) => {
@@ -131,51 +127,58 @@ const PatientDashboard: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen">
-      {/* Sidebar */}
-      <div className="w-48 flex-shrink-0">
+    <div className="flex h-screen bg-gray-50">
+      {/* Collapsible Sidebar */}
+      <div className={`fixed h-screen z-20 transition-all duration-300 ${isSidebarCollapsed ? 'w-[80px]' : 'w-[260px]'}`}>
         <Sidebar
           isCollapsed={isSidebarCollapsed}
-          onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)} />
+          onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        />
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className={`flex-1 flex flex-col transition-all duration-300 ${isSidebarCollapsed ? 'ml-[80px]' : 'ml-[260px]'}`}>
         <Header />
+        <div className="px-6 py-6">
+          {/* Dashboard Header */}
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800">Patient Management</h1>
+              <p className="text-gray-600 mt-1">{patients.length} registered patients</p>
+            </div>
+            <button
+              onClick={handleAddPatient}
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center gap-2"
+            >
+              <span>+</span>
+              <span>Add New Patient</span>
+            </button>
+          </div>
 
-        <div className="p-6">
-          <h2 className="text-2xl font-bold mb-4">Patient Dashboard</h2>
-          <button
-            onClick={handleAddPatient}
-            className="bg-green-500 text-white px-4 py-2 rounded mb-4"
-          >
-            Add Patient
-          </button>
-
-          <PatientTable
-            patients={patients}
-            handleEditPatient={handleEditPatient}
-            handleDeletePatient={handleDeletePatient}
-          />
-
-          <button
-            onClick={handleLogout}
-            className="mt-4 bg-red-500 text-white p-2 rounded"
-          >
-            Logout
-          </button>
+          {/* Patient List Card */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-800 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-semibold text-gray-800">Registered Patients</h3>
+              <span className="text-sm text-gray-500">{patients.length} entries</span>
+            </div>
+            <PatientTable
+              patients={patients}
+              handleEditPatient={handleEditPatient}
+              handleDeletePatient={handleDeletePatient}
+            />
+          </div>
         </div>
-        {isModalOpen && (
-          <PatientModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            onSave={handleSaveOrUpdatePatient}
-            onChange={handleChange}
-            formData={formData}
-            isEditing={Boolean(editingPatient)}
-          />
-        )}
       </div>
+      {isModalOpen && (
+        <PatientModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSave={handleSaveOrUpdatePatient}
+          onChange={handleChange}
+          formData={formData}
+          isEditing={Boolean(editingPatient)}
+        />
+      )}
     </div>
   );
 };

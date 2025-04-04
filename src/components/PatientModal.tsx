@@ -1,160 +1,268 @@
-import React from "react";
+import React from 'react';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  Autocomplete,
+  IconButton,
+  Typography,
+  Divider,
+  Box,
+  Paper,
+  styled,
+} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import { Patient } from '../types/patient';
+import { bloodGroups, rhOptions, pakistaniCities } from '../constants/patientConstants';
 
 interface PatientModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: () => void;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  formData: {
-    name: string;
-    age: string;
-    bloodGroup: string;
-    rhFactor: string;
-    city: string;
-    contact: string;
-  };
+  formData: Omit<Patient, 'id'>;
   isEditing: boolean;
 }
 
-const PatientModal: React.FC<PatientModalProps> = ({
+// Custom styled radio button component
+const CustomRadioButton = styled(Radio)(({ theme }) => ({
+  display: 'none', // Hide the default radio button
+}));
+
+// Styled container for the radio option
+const RadioOption = styled(Box)(({ theme, selected }: { theme?: any; selected: boolean }) => ({
+  padding: '10px 16px',
+  borderRadius: '6px',
+  border: '1px solid',
+  borderColor: selected ? theme.palette.primary.main : theme.palette.divider,
+  backgroundColor: selected ? theme.palette.primary.light : theme.palette.background.paper,
+  color: selected ? theme.palette.primary.contrastText : theme.palette.text.primary,
+  cursor: 'pointer',
+  transition: 'all 0.2s ease',
+  textAlign: 'center',
+  fontWeight: 500,
+  '&:hover': {
+    borderColor: theme.palette.primary.main,
+    backgroundColor: selected ? theme.palette.primary.light : theme.palette.action.hover,
+  },
+}));
+
+const EnhancedDropdownPaper = (props: React.HTMLAttributes<HTMLElement>) => (
+  <Paper
+    {...props}
+    sx={{
+      mt: 0.5,
+      borderRadius: 1,
+      boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.12)',
+      border: '1px solid rgba(0, 0, 0, 0.08)',
+      '& .MuiAutocomplete-listbox': {
+        py: 0,
+        '& li': {
+          fontSize: '0.875rem',
+          padding: '8px 16px',
+          '&:hover': {
+            backgroundColor: 'rgba(0, 0, 0, 0.04)',
+          },
+        },
+      },
+    }}
+  />
+);
+
+const PatientModal = ({
   isOpen,
   onClose,
   onSave,
   onChange,
   formData,
   isEditing,
-}) => {
-  if (!isOpen) return null;
+}: PatientModalProps) => {
+  const handleFieldChange = (name: string, value: string) => {
+    onChange({ target: { name, value } } as React.ChangeEvent<HTMLInputElement>);
+  };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm z-50">
-      <div className="bg-white p-6 rounded-xl shadow-2xl w-[95%] md:w-[500px] max-h-[85vh] overflow-y-auto">
-        <h3 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
-          {isEditing ? "Edit Patient" : "Add Patient"}
-        </h3>
+    <Dialog
+      open={isOpen}
+      onClose={onClose}
+      fullWidth
+      maxWidth="sm"
+      PaperProps={{
+        sx: {
+          borderRadius: 2,
+          border: '1px solid #e0e0e0',
+          boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.08)',
+          overflow: 'visible',
+        },
+      }}
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 3,
+          borderBottom: '1px solid #f0f0f0',
+          bgcolor: '#fafafa',
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <PersonAddIcon sx={{ color: 'text.primary', fontSize: 22 }} />
+          <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.1rem' }}>
+            {isEditing ? 'Edit Patient Record' : 'New Patient Registration'}
+          </Typography>
+        </Box>
+        <IconButton onClick={onClose} size="small" sx={{ color: 'text.secondary' }}>
+          <CloseIcon fontSize="small" />
+        </IconButton>
+      </Box>
 
-        <div className="space-y-4">
-          {/* Full width field for Name */}
-          <div>
-            <label htmlFor="name" className="block text-gray-700 mb-1">
-              Name
-            </label>
-            <input
-              id="name"
-              type="text"
-              name="name"
-              placeholder="Enter full name"
-              value={formData.name}
+      <DialogContent sx={{ p: 3 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+          <TextField
+            fullWidth
+            label="Full Name"
+            name="name"
+            value={formData.name}
+            onChange={onChange}
+            InputLabelProps={{ shrink: true }}
+          />
+
+          <Box sx={{ display: 'flex', gap: 3 }}>
+            <TextField
+              fullWidth
+              label="Age"
+              name="age"
+              type="number"
+              value={formData.age}
               onChange={onChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-              required
+              InputLabelProps={{ shrink: true }}
             />
-          </div>
+            <Autocomplete
+              fullWidth
+              options={bloodGroups}
+              value={formData.bloodGroup}
+              onChange={(_, newValue) => handleFieldChange('bloodGroup', newValue || '')}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Blood Group"
+                  InputLabelProps={{ shrink: true }}
+                />
+              )}
+              PaperComponent={EnhancedDropdownPaper}
+            />
+          </Box>
 
-          {/* Two columns: Age & Blood Group */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="age" className="block text-gray-700 mb-1">
-                Age
-              </label>
-              <input
-                id="age"
-                type="number"
-                name="age"
-                placeholder="Enter age"
-                value={formData.age}
-                onChange={onChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="bloodGroup" className="block text-gray-700 mb-1">
-                Blood Group
-              </label>
-              <input
-                id="bloodGroup"
-                type="text"
-                name="bloodGroup"
-                placeholder="e.g., A, B, AB, O"
-                value={formData.bloodGroup}
-                onChange={onChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                required
-              />
-            </div>
-          </div>
-
-          {/* Full width field for Rh Factor */}
-          <div>
-            <label htmlFor="rhFactor" className="block text-gray-700 mb-1">
+          <FormControl component="fieldset">
+            <FormLabel component="legend" sx={{ 
+              mb: 1.5,
+              color: 'text.secondary',
+              fontSize: '0.75rem',
+              fontWeight: 500,
+            }}>
               Rh Factor
-            </label>
-            <input
-              id="rhFactor"
-              type="text"
+            </FormLabel>
+            <RadioGroup
+              row
               name="rhFactor"
-              placeholder="Enter Rh Factor (Positive/Negative)"
               value={formData.rhFactor}
-              onChange={onChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-              required
+              onChange={(e) => handleFieldChange('rhFactor', e.target.value)}
+              sx={{ gap: 2 }}
+            >
+              {rhOptions.map((option: string) => (
+                <FormControlLabel
+                  key={option}
+                  value={option}
+                  control={<CustomRadioButton />}
+                  label={
+                    <RadioOption selected={formData.rhFactor === option}>
+                      {option}
+                    </RadioOption>
+                  }
+                  sx={{ margin: 0 }}
+                />
+              ))}
+            </RadioGroup>
+          </FormControl>
+
+          <Divider sx={{ my: 1 }} />
+
+          <Box sx={{ display: 'flex', gap: 3 }}>
+            <Autocomplete
+              fullWidth
+              options={pakistaniCities}
+              value={formData.city}
+              onChange={(_, newValue) => handleFieldChange('city', newValue || '')}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="City"
+                  InputLabelProps={{ shrink: true }}
+                />
+              )}
+              PaperComponent={EnhancedDropdownPaper}
             />
-          </div>
+            <TextField
+              fullWidth
+              label="Phone Number"
+              name="contact"
+              type="tel"
+              value={formData.contact}
+              onChange={onChange}
+              InputLabelProps={{ shrink: true }}
+            />
+          </Box>
 
-          {/* Two columns: City & Contact */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="city" className="block text-gray-700 mb-1">
-                City
-              </label>
-              <input
-                id="city"
-                type="text"
-                name="city"
-                placeholder="Enter city"
-                value={formData.city}
-                onChange={onChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="contact" className="block text-gray-700 mb-1">
-                Contact
-              </label>
-              <input
-                id="contact"
-                type="tel"
-                name="contact"
-                placeholder="Enter contact number"
-                value={formData.contact}
-                onChange={onChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                required
-              />
-            </div>
-          </div>
-        </div>
+          <TextField
+            fullWidth
+            label="Diagnosis"
+            name="diagnosis"
+            value={formData.diagnosis || ''}
+            onChange={onChange}
+            InputLabelProps={{ shrink: true }}
+            multiline
+            rows={2}
+          />
+          
+          <TextField
+            fullWidth
+            label="Treatment Plan"
+            name="treatmentPlan"
+            value={formData.treatmentPlan || ''}
+            onChange={onChange}
+            InputLabelProps={{ shrink: true }}
+            multiline
+            rows={3}
+          />
+        </Box>
+      </DialogContent>
 
-        <div className="flex justify-end gap-4 mt-6">
-          <button
-            onClick={onClose}
-            className="px-5 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onSave}
-            className={`px-5 py-2 ${
-              isEditing ? "bg-blue-500 hover:bg-blue-600" : "bg-green-500 hover:bg-green-600"
-            } text-white rounded-lg transition`}
-          >
-            {isEditing ? "Save Changes" : "Add Patient"}
-          </button>
-        </div>
-      </div>
-    </div>
+      <DialogActions sx={{ p: 3, borderTop: '1px solid #f0f0f0', bgcolor: '#fafafa' }}>
+        <Button
+          onClick={onClose}
+          sx={{ px: 3, py: 1, borderRadius: 1, border: '1px solid #e0e0e0' }}
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="contained"
+          onClick={onSave}
+          sx={{ px: 3, py: 1, borderRadius: 1, bgcolor: '#424242' }}
+        >
+          {isEditing ? 'Save Changes' : 'Register Patient'}
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 

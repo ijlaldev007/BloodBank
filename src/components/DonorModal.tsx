@@ -1,4 +1,35 @@
-import React from "react";
+import React from 'react';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  FormControl,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  Autocomplete,
+  IconButton,
+  Typography,
+  Divider,
+  Box,
+} from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import {
+  bloodGroups,
+  rhOptions,
+  eligibilityOptions,
+  pakistaniCities,
+} from '../constants/donorConstants';
+import {
+  RadioOption,
+  SectionHeader,
+  DialogPaper,
+  ActionButton,
+} from './styled/DonorStyled';
 
 interface DonorModalProps {
   isOpen: boolean;
@@ -22,6 +53,19 @@ interface DonorModalProps {
   isEditing: boolean;
 }
 
+// Flex container for two-column layout
+const FlexTwoColumn = (props: { children: React.ReactNode }) => (
+  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>{props.children}</Box>
+);
+
+// Field wrappers to control width
+const HalfWidthField = (props: { children: React.ReactNode }) => (
+  <Box sx={{ flex: '1 1 calc(50% - 16px)' }}>{props.children}</Box>
+);
+const FullWidthField = (props: { children: React.ReactNode }) => (
+  <Box sx={{ flex: '1 1 100%' }}>{props.children}</Box>
+);
+
 const DonorModal: React.FC<DonorModalProps> = ({
   isOpen,
   onClose,
@@ -30,222 +74,258 @@ const DonorModal: React.FC<DonorModalProps> = ({
   formData,
   isEditing,
 }) => {
-  if (!isOpen) return null;
+  const handleFieldChange = (name: string, value: string) => {
+    onChange({ target: { name, value } } as React.ChangeEvent<HTMLInputElement>);
+  };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm z-50">
-      <div className="bg-white p-6 rounded-xl shadow-2xl w-[95%] md:w-[600px] max-h-[85vh] overflow-y-auto">
-        <h3 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
-          {isEditing ? "Edit Donor" : "Add Donor"}
-        </h3>
+    <Dialog
+      open={isOpen}
+      onClose={onClose}
+      fullWidth
+      maxWidth="md"
+      PaperProps={{
+        sx: {
+          borderRadius: 2,
+          border: '1px solid #e0e0e0',
+          boxShadow: '0px 2px 10px rgba(0, 0, 0, 0.08)',
+          overflow: 'visible',
+        },
+      }}
+    >
+      <DialogTitle
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          p: 3,
+          borderBottom: '1px solid #f0f0f0',
+          bgcolor: '#fafafa',
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 1.5 }}>
+          <PersonAddIcon sx={{ color: 'text.primary', fontSize: 22 }} />
+          <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.1rem' }}>
+            {isEditing ? 'Edit Donor Information' : 'Register New Donor'}
+          </Typography>
+        </Box>
+        <IconButton onClick={onClose} size="small" sx={{ color: 'text.secondary' }}>
+          <CloseIcon fontSize="small" />
+        </IconButton>
+      </DialogTitle>
 
-        <div className="space-y-4">
-          {/* Personal Information */}
-          <div>
-            <label htmlFor="name" className="block text-gray-700 mb-1">
-              Name
-            </label>
-            <input
-              id="name"
-              type="text"
+      <DialogContent sx={{ p: 3 }}>
+        {/* Personal Details */}
+        <SectionHeader>Personal Details</SectionHeader>
+        <FlexTwoColumn>
+          <FullWidthField>
+            <TextField
+              fullWidth
+              label="Full Name"
               name="name"
-              placeholder="Enter full name"
               value={formData.name}
               onChange={onChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-              required
+              variant="outlined"
+              size="small"
+              InputLabelProps={{ shrink: true }}
             />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="bloodGroup" className="block text-gray-700 mb-1">
-                Blood Group
-              </label>
-              <input
-                id="bloodGroup"
-                type="text"
-                name="bloodGroup"
-                placeholder="e.g., A, B, AB, O"
-                value={formData.bloodGroup}
-                onChange={onChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="rhFactor" className="block text-gray-700 mb-1">
+          </FullWidthField>
+          <HalfWidthField>
+            <Autocomplete
+              fullWidth
+              options={bloodGroups}
+              value={formData.bloodGroup}
+              onChange={(_, newValue) =>
+                handleFieldChange('bloodGroup', newValue || '')
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Blood Group"
+                  variant="outlined"
+                  size="small"
+                  InputLabelProps={{ shrink: true }}
+                />
+              )}
+            />
+          </HalfWidthField>
+          <HalfWidthField>
+            <FormControl component="fieldset" fullWidth>
+              <FormLabel component="legend" sx={{ mb: 1, fontSize: '0.875rem' }}>
                 Rh Factor
-              </label>
-              <input
-                id="rhFactor"
-                type="text"
+              </FormLabel>
+              <RadioGroup
+                row
                 name="rhFactor"
-                placeholder="Positive/Negative"
                 value={formData.rhFactor}
-                onChange={onChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-              />
-            </div>
-          </div>
+                onChange={(e) => handleFieldChange('rhFactor', e.target.value)}
+                sx={{ gap: 1 }}
+              >
+                {rhOptions.map((option) => (
+                  <FormControlLabel
+                    key={option}
+                    value={option}
+                    control={<Radio sx={{ display: 'none' }} />}
+                    label={
+                      <RadioOption selected={formData.rhFactor === option}>
+                        {option}
+                      </RadioOption>
+                    }
+                    sx={{ m: 0 }}
+                  />
+                ))}
+              </RadioGroup>
+            </FormControl>
+          </HalfWidthField>
+        </FlexTwoColumn>
 
-          {/* Donation & Medical Data */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="lastDonationDate" className="block text-gray-700 mb-1">
-                Last Donation Date
-              </label>
-              <input
-                id="lastDonationDate"
-                type="date"
-                name="lastDonationDate"
-                value={formData.lastDonationDate}
-                onChange={onChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-              />
-            </div>
-            <div>
-              <label htmlFor="ongoingMedications" className="block text-gray-700 mb-1">
-                Ongoing Medications
-              </label>
-              <input
-                id="ongoingMedications"
-                type="text"
-                name="ongoingMedications"
-                placeholder="List any medications"
-                value={formData.ongoingMedications}
-                onChange={onChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label htmlFor="chronicDiseases" className="block text-gray-700 mb-1">
-              Chronic Diseases
-            </label>
-            <input
-              id="chronicDiseases"
-              type="text"
-              name="chronicDiseases"
-              placeholder="E.g., Diabetes, Hypertension"
-              value={formData.chronicDiseases}
+        {/* Medical Information */}
+        <SectionHeader sx={{ mt: 3 }}>Medical Information</SectionHeader>
+        <FlexTwoColumn>
+          <HalfWidthField>
+            <TextField
+              label="Last Donation Date"
+              name="lastDonationDate"
+              type="date"
+              value={formData.lastDonationDate}
               onChange={onChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              variant="outlined"
+              size="small"
+              InputLabelProps={{ shrink: true }}
             />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="weight" className="block text-gray-700 mb-1">
-                Weight (kg)
-              </label>
-              <input
-                id="weight"
-                type="text"
-                name="weight"
-                placeholder="Weight"
-                value={formData.weight}
-                onChange={onChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-              />
-            </div>
-            <div>
-              <label htmlFor="hemoglobinLevel" className="block text-gray-700 mb-1">
-                Hemoglobin (g/dL)
-              </label>
-              <input
-                id="hemoglobinLevel"
-                type="text"
-                name="hemoglobinLevel"
-                placeholder="Hemoglobin Level"
-                value={formData.hemoglobinLevel}
-                onChange={onChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="allergies" className="block text-gray-700 mb-1">
-                Allergies
-              </label>
-              <input
-                id="allergies"
-                type="text"
-                name="allergies"
-                placeholder="Allergies"
-                value={formData.allergies}
-                onChange={onChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-              />
-            </div>
-            <div>
-              <label htmlFor="eligible" className="block text-gray-700 mb-1">
-                Eligible to Donate
-              </label>
-              <input
-                id="eligible"
-                type="text"
+          </HalfWidthField>
+          <HalfWidthField>
+            <TextField
+              label="Weight (kg)"
+              name="weight"
+              type="number"
+              value={formData.weight}
+              onChange={onChange}
+              variant="outlined"
+              size="small"
+            />
+          </HalfWidthField>
+          <HalfWidthField>
+            <TextField
+              label="Hemoglobin Level (g/dL)"
+              name="hemoglobinLevel"
+              type="number"
+              value={formData.hemoglobinLevel}
+              onChange={onChange}
+              variant="outlined"
+              size="small"
+            />
+          </HalfWidthField>
+          <HalfWidthField>
+            <FormControl component="fieldset" fullWidth>
+              <FormLabel component="legend" sx={{ mb: 1, fontSize: '0.875rem' }}>
+                Eligibility Status
+              </FormLabel>
+              <RadioGroup
+                row
                 name="eligible"
                 value={formData.eligible}
-                readOnly
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-100 focus:outline-none"
-              />
-            </div>
-          </div>
+                onChange={(e) => handleFieldChange('eligible', e.target.value)}
+                sx={{ gap: 1 }}
+              >
+                {eligibilityOptions.map((option) => (
+                  <FormControlLabel
+                    key={option}
+                    value={option}
+                    control={<Radio sx={{ display: 'none' }} />}
+                    label={
+                      <RadioOption selected={formData.eligible === option}>
+                        {option}
+                      </RadioOption>
+                    }
+                    sx={{ m: 0 }}
+                  />
+                ))}
+              </RadioGroup>
+            </FormControl>
+          </HalfWidthField>
+          <FullWidthField>
+            <TextField
+              fullWidth
+              label="Ongoing Medications"
+              name="ongoingMedications"
+              value={formData.ongoingMedications}
+              onChange={onChange}
+              variant="outlined"
+              size="small"
+              multiline
+              rows={2}
+            />
+          </FullWidthField>
+          <HalfWidthField>
+            <TextField
+              fullWidth
+              label="Chronic Diseases"
+              name="chronicDiseases"
+              value={formData.chronicDiseases}
+              onChange={onChange}
+              variant="outlined"
+              size="small"
+            />
+          </HalfWidthField>
+          <HalfWidthField>
+            <TextField
+              fullWidth
+              label="Allergies"
+              name="allergies"
+              value={formData.allergies}
+              onChange={onChange}
+              variant="outlined"
+              size="small"
+            />
+          </HalfWidthField>
+        </FlexTwoColumn>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="city" className="block text-gray-700 mb-1">
-                City
-              </label>
-              <input
-                id="city"
-                type="text"
-                name="city"
-                placeholder="City"
-                value={formData.city}
-                onChange={onChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-              />
-            </div>
-            <div>
-              <label htmlFor="contact" className="block text-gray-700 mb-1">
-                Contact
-              </label>
-              <input
-                id="contact"
-                type="tel"
-                name="contact"
-                placeholder="Contact Number"
-                value={formData.contact}
-                onChange={onChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-              />
-            </div>
-          </div>
-        </div>
+        {/* Contact Details */}
+        <SectionHeader sx={{ mt: 3 }}>Contact Details</SectionHeader>
+        <FlexTwoColumn>
+          <HalfWidthField>
+            <Autocomplete
+              fullWidth
+              options={pakistaniCities}
+              value={formData.city}
+              onChange={(_, newValue) => handleFieldChange('city', newValue || '')}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="City"
+                  variant="outlined"
+                  size="small"
+                  InputLabelProps={{ shrink: true }}
+                />
+              )}
+            />
+          </HalfWidthField>
+          <HalfWidthField>
+            <TextField
+              fullWidth
+              label="Contact Number"
+              name="contact"
+              type="tel"
+              value={formData.contact}
+              onChange={onChange}
+              variant="outlined"
+              size="small"
+              InputLabelProps={{ shrink: true }}
+            />
+          </HalfWidthField>
+        </FlexTwoColumn>
+      </DialogContent>
 
-        <div className="flex justify-end gap-4 mt-6">
-          <button
-            onClick={onClose}
-            className="px-5 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-          >
-            Cancel
-          </button>
-
-          <button
-            onClick={onSave}
-            className={`px-5 py-2 ${isEditing ? "bg-blue-500 hover:bg-blue-600" : "bg-green-500 hover:bg-green-600"
-              } text-white rounded-lg transition`}
-          >
-            {isEditing ? "Save Changes" : "Add Donor"}
-          </button>
-        </div>
-      </div>
-    </div>
+      <DialogActions sx={{ px: 3, py: 2, borderTop: '1px solid', borderColor: 'divider', bgcolor: '#fafafa' }}>
+        <ActionButton onClick={onClose} variant="outlined" color="inherit">
+          Cancel
+        </ActionButton>
+        <ActionButton onClick={onSave} variant="contained" color={isEditing ? 'primary' : 'success'}>
+          {isEditing ? 'Update Donor' : 'Register Now'}
+        </ActionButton>
+      </DialogActions>
+    </Dialog>
   );
 };
 
