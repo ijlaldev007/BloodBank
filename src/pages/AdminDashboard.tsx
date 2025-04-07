@@ -1,7 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { signOut } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
-import { auth } from "../firebase/firebase";
 import Sidebar from "../components/Sidebar";
 import DonorModal from "../components/DonorModal";
 import DonorTable from "../components/DonorTable";
@@ -9,7 +6,7 @@ import Header from "../components/Header";
 import { Donor, initialDonorFormData } from "../types/donor";
 import { fetchDonors, addDonor, updateDonor, deleteDonor } from "../services/donorService";
 import { computeEligibility } from "../utils/eligibility";
-import { ChevronLeft, ChevronRight } from "@mui/icons-material";
+
 
 
 const AdminDashboard = () => {
@@ -18,7 +15,6 @@ const AdminDashboard = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingDonor, setEditingDonor] = useState<Donor | null>(null);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-    const navigate = useNavigate();
 
     useEffect(() => {
         const loadDonors = async () => {
@@ -87,10 +83,7 @@ const AdminDashboard = () => {
         }
     };
 
-    const handleLogout = async () => {
-        await signOut(auth);
-        navigate("/login");
-    };
+    
 
     return (
 

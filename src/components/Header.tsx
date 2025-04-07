@@ -5,11 +5,10 @@ import { useNavigate } from "react-router-dom";
 
 
 import { useAuth } from "../context/AuthContext";
-import PropTypes from "prop-types";
 
 const Header = () => {
     const navigate = useNavigate();
-    const { user, role } = useAuth();
+    useAuth();
 
     const handleLogout = async () => {
         await signOut(auth);
@@ -24,7 +23,7 @@ const Header = () => {
             </h1>
 
             <div className="flex items-center gap-4">
-                <span className="text-gray-600">{user?.email}</span>
+                
                 <button
                     onClick={handleLogout}
                     className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-colors"

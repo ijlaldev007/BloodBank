@@ -10,6 +10,9 @@ import {
   ChevronLeft,
   ChevronRight
 } from '@mui/icons-material';
+import { useAuth } from "../context/AuthContext";
+
+
 
 interface SidebarProps {
   onAddDonor?: () => void;
@@ -22,6 +25,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   isCollapsed = false,
   onToggleCollapse = () => { }
 }) => {
+  const { user, name } = useAuth();
   return (
     <div className={`fixed left-0 top-0 h-screen bg-white shadow-xl flex flex-col border-r border-gray-100 transition-all duration-300 ${isCollapsed ? 'w-[80px]' : 'w-[260px]'
       }`}>
@@ -86,8 +90,8 @@ const Sidebar: React.FC<SidebarProps> = ({
           <Avatar className="w-10 h-10" src="path/to/your/profile.jpg" />
           {!isCollapsed && (
             <div>
-              <p className="text-sm font-medium text-gray-800">David Oliva</p>
-              <p className="text-xs text-gray-500">admin@bloodconnect.com</p>
+              <p className="text-sm font-medium text-gray-800">{name || 'Anonymous'}</p>
+              <p className="text-xs text-gray-500">{user?.email}</p>
             </div>
           )}
         </div>
