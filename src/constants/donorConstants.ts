@@ -10,3 +10,4 @@ export const pakistaniCities = [
 export type BloodGroup = typeof bloodGroups[number];
 export type RhFactor = typeof rhOptions[number];
 export type City = typeof pakistaniCities[number];
+

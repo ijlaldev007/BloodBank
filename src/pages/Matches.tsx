@@ -8,6 +8,7 @@ import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
 
 interface Donor {
+    eligible: string;
     id: string;
     name: string;
     bloodGroup: BloodGroup;
@@ -133,6 +134,7 @@ const Matches = () => {
         return donorList.filter(donor => 
             donor.isAvailable &&
             donor.city === patient.city &&
+            donor.eligible === "Yes" &&
             isCompatibleDonor(
                 donor.bloodGroup, 
                 donor.rhFactor, 

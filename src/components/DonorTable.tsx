@@ -1,14 +1,14 @@
 import React from "react";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
-  TableRow, 
-  TablePagination, 
-  Typography, 
-  Button, 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TablePagination,
+  Typography,
+  Button,
   Paper,
   IconButton,
   Tooltip,
@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import { Donor } from "../types/donor";
+import { computeEligibility } from "../utils/eligibility";
 
 interface DonorTableProps {
   donors: Donor[];
@@ -79,8 +80,10 @@ const DonorTable: React.FC<DonorTableProps> = ({ donors, handleDeleteDonor, hand
         return `${donor.hemoglobinLevel} g/dL`;
       case "Allergies":
         return donor.allergies?.substring(0, 15) + (donor.allergies?.length > 15 ? "..." : "");
+      // In DonorTable.tsx
       case "Eligible":
-        return donor.eligible ? (
+        const eligibility = computeEligibility(donor);
+        return eligibility === "Yes" ? (
           <Typography color="success.main">Yes</Typography>
         ) : (
           <Typography color="error.main">No</Typography>
@@ -93,7 +96,7 @@ const DonorTable: React.FC<DonorTableProps> = ({ donors, handleDeleteDonor, hand
         return (
           <Box display="flex" gap={1}>
             <Tooltip title="Edit">
-              <IconButton 
+              <IconButton
                 onClick={() => handleEditDonor(donor)}
                 color="primary"
                 size="small"
@@ -102,7 +105,7 @@ const DonorTable: React.FC<DonorTableProps> = ({ donors, handleDeleteDonor, hand
               </IconButton>
             </Tooltip>
             <Tooltip title="Delete">
-              <IconButton 
+              <IconButton
                 onClick={() => handleDeleteDonor(donor.id)}
                 color="error"
                 size="small"
@@ -118,17 +121,17 @@ const DonorTable: React.FC<DonorTableProps> = ({ donors, handleDeleteDonor, hand
   };
 
   return (
-    <Paper sx={{ 
-      width: '100%', 
-      overflow: 'hidden', 
-      borderRadius: 2, 
+    <Paper sx={{
+      width: '100%',
+      overflow: 'hidden',
+      borderRadius: 2,
       boxShadow: 3,
       '& .MuiTable-root': {
         minWidth: 'max-content'
       }
     }}>
       <TableContainer sx={{ maxHeight: 'calc(100vh - 200px)' }}>
-        <Table 
+        <Table
           stickyHeader
           aria-label="donor table"
           sx={{
@@ -144,9 +147,9 @@ const DonorTable: React.FC<DonorTableProps> = ({ donors, handleDeleteDonor, hand
           <TableHead>
             <TableRow>
               {getVisibleHeaders().map((head) => (
-                <TableCell 
-                  key={head} 
-                  sx={{ 
+                <TableCell
+                  key={head}
+                  sx={{
                     backgroundColor: theme.palette.primary.main,
                     color: theme.palette.common.white
                   }}
@@ -167,15 +170,15 @@ const DonorTable: React.FC<DonorTableProps> = ({ donors, handleDeleteDonor, hand
               </TableRow>
             ) : (
               donors.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((donor) => (
-                <TableRow 
+                <TableRow
                   key={donor.id}
                   hover
-                  sx={{ 
-                    '&:nth-of-type(even)': { 
-                      backgroundColor: theme.palette.action.hover 
+                  sx={{
+                    '&:nth-of-type(even)': {
+                      backgroundColor: theme.palette.action.hover
                     },
-                    '&:last-child td': { 
-                      borderBottom: 0 
+                    '&:last-child td': {
+                      borderBottom: 0
                     }
                   }}
                 >
