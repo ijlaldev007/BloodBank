@@ -30,6 +30,8 @@ import {
   ActionButton,
 } from './styled/DonorStyled';
 
+import { toast } from 'react-toastify';
+
 interface DonorFormData {
   name: string;
   bloodGroup: string;
@@ -129,10 +131,12 @@ const DonorModal: React.FC<DonorModalProps> = ({
     onSubmit: async (values, { resetForm }) => {
       try {
         await onSave(values);
+        toast.success('Donor saved successfully!');
         resetForm();
         onClose();
       } catch (error) {
         console.error('Error submitting form:', error);
+        toast.error('Could not save donor. Please try again.');
       }
     },
   });

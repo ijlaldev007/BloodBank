@@ -8,6 +8,8 @@ import { fetchDonors, addDonor, updateDonor, deleteDonor } from "../services/don
 import { computeEligibility } from "../utils/eligibility";
 import { Grid, Card, CardContent, Typography, Box } from '@mui/material';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 
 
@@ -48,6 +50,7 @@ const AdminDashboard = () => {
 
             } catch (error) {
                 console.error(error);
+                toast.error("Operation failed. Please try again.");
             }
         };
         loadDonors();
@@ -71,9 +74,11 @@ const AdminDashboard = () => {
         if (window.confirm("Are you sure you want to delete this donor?")) {
             try {
                 await deleteDonor(id);
+                toast.success('Donor Deleted successfully!');
                 setDonors(donors.filter((donor) => donor.id !== id));
             } catch (error) {
                 console.error(error);
+                toast.error("Operation failed. Please try again.");
             }
         }
     };
@@ -83,13 +88,13 @@ const AdminDashboard = () => {
         try {
             // Calculate eligibility using all criteria
             if (!formData.name || !formData.bloodGroup || !formData.rhFactor) {
-                alert("Please fill in required fields: Name, Blood Group, and Rh Factor");
+                toast.error("Please fill in required fields: Name, Blood Group, and Rh Factor");
                 return;
             }
     
             // Numeric validation
             if (isNaN(Number(formData.weight)) || isNaN(Number(formData.hemoglobinLevel))) {
-                alert("Please enter valid numbers for weight and hemoglobin");
+                toast.error("Please enter valid numbers for weight and hemoglobin");
                 return;
             }
     
@@ -112,7 +117,7 @@ const AdminDashboard = () => {
             setEditingDonor(null);
         } catch (error) {
             console.error("Error saving donor:", error);
-            alert("Operation failed. Please try again.");
+            toast.error("Operation failed. Please try again.");
         }
 
     };
